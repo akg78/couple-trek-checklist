@@ -3,6 +3,7 @@ import { trekkingChecklist } from '~/data/trekking-checklist'
 export const TREK_CATEGORIES = trekkingChecklist.map(group => group.category)
 
 const POLL_MS = 5000
+const LOCAL_CHECKLIST_KEY = 'couple-trek-checklist-v3'
 
 const sortItems = (list) =>
   list.sort((a, b) => a.created_at.localeCompare(b.created_at))
@@ -39,7 +40,41 @@ const makeSeedItems = () => {
 
 function getActiveUserId() {
   if (!import.meta.client) return null
-  return sessionStorage.getItem(USER_STORAGE_KEY)
+  return (
+    localStorage.getItem(USER_STORAGE_KEY) ||
+    sessionStorage.getItem(USER_STORAGE_KEY)
+  )
+}
+
+function readLocalSnapshot() {
+  if (!import.meta.client) return null
+  try {
+    const raw = localStorage.getItem(LOCAL_CHECKLIST_KEY)
+    if (!raw) return null
+    const data = JSON.parse(raw)
+    if (!Array.isArray(data.items) || !data.items.length) return null
+    return {
+      revision: Number(data.revision) || 0,
+      items: normalizeItems([...data.items])
+    }
+  } catch {
+    return null
+  }
+}
+
+function writeLocalSnapshot(rev, list) {
+  if (!import.meta.client) return
+  try {
+    localStorage.setItem(
+      LOCAL_CHECKLIST_KEY,
+      JSON.stringify({
+        revision: Number(rev) || 0,
+        items: list
+      })
+    )
+  } catch (error) {
+    console.error(error)
+  }
 }
 
 export function useTrekChecklist() {
@@ -59,6 +94,7 @@ export function useTrekChecklist() {
     applyingRemote = true
     revision.value = remoteRev
     items.value = normalizeItems([...data.items])
+    writeLocalSnapshot(revision.value, items.value)
     applyingRemote = false
   }
 
@@ -71,6 +107,7 @@ export function useTrekChecklist() {
         body: { items: items.value }
       })
       revision.value = data.revision
+      writeLocalSnapshot(revision.value, items.value)
     } catch (error) {
       console.error(error)
     } finally {
@@ -122,21 +159,52 @@ export function useTrekChecklist() {
 
   const load = async () => {
     hydrated.value = false
+    const local = readLocalSnapshot()
+    let server = null
+
     try {
-      const data = await $fetch('/api/checklist')
-      if (data.items?.length) {
-        revision.value = data.revision
-        items.value = normalizeItems(data.items)
-      } else {
-        items.value = makeSeedItems()
+      server = await $fetch('/api/checklist')
+    } catch (error) {
+      console.error(error)
+    }
+
+    const serverRev = Number(server?.revision) || 0
+    const serverItems =
+      server?.items?.length ? normalizeItems([...server.items]) : null
+    const localRev = local?.revision ?? 0
+    const localItems = local?.items ?? null
+
+    if (serverItems && serverRev >= localRev) {
+      revision.value = serverRev
+      items.value = serverItems
+    } else if (localItems?.length) {
+      revision.value = localRev
+      items.value = localItems
+      if (!serverItems || localRev > serverRev) {
         await pushToServer({ initial: true })
       }
-    } catch {
+    } else if (serverItems) {
+      revision.value = serverRev
+      items.value = serverItems
+    } else {
       items.value = makeSeedItems()
+      await pushToServer({ initial: true })
     }
+
+    writeLocalSnapshot(revision.value, items.value)
     hydrated.value = true
     startLiveSync()
   }
+
+  watch(
+    items,
+    () => {
+      if (hydrated.value && !applyingRemote) {
+        writeLocalSnapshot(revision.value, items.value)
+      }
+    },
+    { deep: true }
+  )
 
   const addItem = (name, category, owner) => {
     const trimmed = name.trim()
