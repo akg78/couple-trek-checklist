@@ -21,6 +21,55 @@ body {
 button, input, select { font: inherit; }
 button { cursor: pointer; }
 
+.pin-screen {
+  min-height: 100dvh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding:
+    calc(16px + var(--safe-top))
+    max(16px, env(safe-area-inset-right))
+    calc(16px + var(--safe-bottom))
+    max(16px, env(safe-area-inset-left));
+}
+
+.pin-card {
+  width: min(100%, 380px);
+  padding: 22px 18px;
+  border: 1px solid #292c33;
+  background: #15171c;
+  border-radius: 18px;
+}
+
+.pin-card h1 {
+  margin: 8px 0 6px;
+  font-size: 28px;
+}
+
+.pin-lead {
+  margin: 0 0 16px;
+  color: #a7a9b2;
+  font-size: 14px;
+  line-height: 1.45;
+}
+
+.pin-input {
+  letter-spacing: 0.35em;
+  text-align: center;
+  font-size: 22px;
+  margin-bottom: 10px;
+}
+
+.pin-error {
+  margin: 0 0 10px;
+  color: #f0a8a8;
+  font-size: 13px;
+}
+
+.pin-submit {
+  width: 100%;
+}
+
 .page {
   max-width: 720px;
   margin: 0 auto;

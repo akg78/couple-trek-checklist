@@ -1,9 +1,4 @@
-export type TrekSeedGroup = {
-  category: string
-  items: string[]
-}
-
-export const trekkingChecklist: TrekSeedGroup[] = [
+export const trekkingChecklist = [
   {
     category: 'Documents & Money',
     items: [

@@ -1,4 +1,6 @@
-<script setup lang="ts">
+<script setup>
+const { unlocked, ready: pinReady, pin, pinError, checking, init, submitPin } = usePinGate()
+
 const {
   items,
   hydrated,
@@ -11,9 +13,9 @@ const {
   importBackup
 } = useTrekChecklist()
 
-const filter = ref<'all' | 'pending' | 'done'>('all')
+const filter = ref('all')
 const newItem = ref('')
-const newCategory = ref<string>(TREK_CATEGORIES[0])
+const newCategory = ref(TREK_CATEGORIES[0])
 const newOwner = ref(DEFAULT_OWNER)
 
 const filtered = computed(() =>
@@ -24,12 +26,12 @@ const filtered = computed(() =>
 )
 
 const grouped = computed(() => {
-  const map = new Map<string, typeof items.value>()
+  const map = new Map()
   for (const item of filtered.value) {
     if (!map.has(item.category)) map.set(item.category, [])
-    map.get(item.category)!.push(item)
+    map.get(item.category).push(item)
   }
-  return TREK_CATEGORIES.filter(cat => map.has(cat)).map(cat => [cat, map.get(cat)!] as const)
+  return TREK_CATEGORIES.filter(cat => map.has(cat)).map(cat => [cat, map.get(cat)])
 })
 
 const completed = computed(() => items.value.filter(i => i.done).length)
@@ -43,7 +45,7 @@ const addItem = () => {
   }
 }
 
-const confirmRemove = (item: (typeof items.value)[number]) => {
+const confirmRemove = (item) => {
   if (confirm(`Delete "${item.name}"?`)) removeItem(item)
 }
 
@@ -53,14 +55,43 @@ const confirmRestore = () => {
   }
 }
 
-onMounted(() => load())
+onMounted(() => {
+  init()
+})
+
+watch(unlocked, value => {
+  if (value && !hydrated.value) load()
+}, { immediate: true })
 </script>
 
 <template>
-  <main v-if="hydrated" class="page">
+  <div v-if="pinReady && !unlocked" class="pin-screen">
+    <div class="pin-card">
+      <div class="eyebrow">🏔️ TREK CHECKLIST</div>
+      <h1>Enter PIN</h1>
+      <p class="pin-lead">6-digit code to open the packing list.</p>
+      <input
+        v-model="pin"
+        type="password"
+        inputmode="numeric"
+        maxlength="6"
+        autocomplete="off"
+        class="pin-input"
+        placeholder="••••••"
+        aria-label="6-digit PIN"
+        @keyup.enter="submitPin"
+      />
+      <p v-if="pinError" class="pin-error" role="alert">{{ pinError }}</p>
+      <button type="button" class="btn-primary pin-submit" :disabled="checking" @click="submitPin">
+        {{ checking ? 'Checking…' : 'Unlock' }}
+      </button>
+    </div>
+  </div>
+
+  <main v-else-if="unlocked && hydrated" class="page">
     <section class="hero">
       <div>
-        <div class="eyebrow">🏔️ ANKIT & BAISHAKHI</div>
+        <div class="eyebrow">🏔️ COUPLE TREK</div>
         <h1>Our Trek Checklist</h1>
         <p>Tungnath → Chandrashila</p>
       </div>
