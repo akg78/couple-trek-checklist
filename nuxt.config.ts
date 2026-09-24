@@ -1,7 +1,8 @@
 export default defineNuxtConfig({
   compatibilityDate: '2026-01-01',
   runtimeConfig: {
-    trekPin: process.env.TREK_PIN || ''
+    // Vercel/runtime: NUXT_TREK_PIN. Local .env may use TREK_PIN or NUXT_TREK_PIN.
+    trekPin: process.env.NUXT_TREK_PIN || process.env.TREK_PIN || ''
   },
   css: ['~/assets/scss/main.scss'],
   app: {

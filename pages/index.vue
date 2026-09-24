@@ -74,11 +74,13 @@ watch(unlocked, value => {
         v-model="pin"
         type="password"
         inputmode="numeric"
+        pattern="[0-9]*"
         maxlength="6"
-        autocomplete="off"
+        autocomplete="one-time-code"
         class="pin-input"
         placeholder="••••••"
         aria-label="6-digit PIN"
+        @input="pin = pin.replace(/\D/g, '').slice(0, 6)"
         @keyup.enter="submitPin"
       />
       <p v-if="pinError" class="pin-error" role="alert">{{ pinError }}</p>
