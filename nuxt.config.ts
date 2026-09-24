@@ -3,7 +3,7 @@ export default defineNuxtConfig({
   css: ['~/assets/scss/main.scss'],
   app: {
     head: {
-      title: 'Trek Checklist',
+      title: 'Ankit & Baishakhi — Trek Checklist',
       meta: [
         { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
         { name: 'theme-color', content: '#101114' },

@@ -1,19 +1,20 @@
 import { trekkingChecklist } from '~/data/trekking-checklist'
 
-const STORAGE_KEY = 'couple-trek-checklist-v2'
-
 export const TREK_CATEGORIES = trekkingChecklist.map(group => group.category)
-export const TREK_OWNERS = ['🤝 Shared', '👤 Traveler 1', '👤 Traveler 2']
-export const DEFAULT_OWNER = TREK_OWNERS[0]
 
-const normalizeOwner = (owner) => {
-  if (owner === '👨 Ankit') return '👤 Traveler 1'
-  if (owner === '👩 Baishakhi' || owner === '👩 Partner') return '👤 Traveler 2'
-  return owner
-}
+const POLL_MS = 2500
 
 const sortItems = (list) =>
   list.sort((a, b) => a.created_at.localeCompare(b.created_at))
+
+const normalizeItems = (list) => {
+  for (const item of list) {
+    item.owner = normalizeOwnerLabel(item.owner)
+    item.packedBy = normalizePackedBy(item)
+    item.done = syncDoneFromPackedBy(item.packedBy)
+  }
+  return sortItems(list)
+}
 
 const makeSeedItems = () => {
   const now = Date.now()
@@ -26,6 +27,7 @@ const makeSeedItems = () => {
         category: group.category,
         name,
         owner: DEFAULT_OWNER,
+        packedBy: emptyPackedBy(),
         done: false,
         created_at: new Date(now + index).toISOString()
       })
@@ -35,36 +37,89 @@ const makeSeedItems = () => {
   return rows
 }
 
-const readStorage = () => {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY)
-    if (!raw) return null
-    const parsed = JSON.parse(raw)
-    return Array.isArray(parsed) ? parsed : null
-  } catch {
-    return null
-  }
-}
-
-const writeStorage = (items) => {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(items))
+function getActiveUserId() {
+  if (!import.meta.client) return null
+  return sessionStorage.getItem(USER_STORAGE_KEY)
 }
 
 export function useTrekChecklist() {
   const items = ref([])
   const hydrated = ref(false)
+  const revision = ref(0)
+  const pushing = ref(false)
+  let pollTimer = null
+  let pushTimer = null
+  let applyingRemote = false
 
-  const load = () => {
-    const stored = readStorage()
-    if (stored?.length) {
-      for (const item of stored) item.owner = normalizeOwner(item.owner)
-      items.value = sortItems(stored)
-      writeStorage(items.value)
-    } else {
+  const applyRemote = (data) => {
+    if (!data || !Array.isArray(data.items)) return
+    if (data.revision === revision.value) return
+    applyingRemote = true
+    revision.value = data.revision
+    items.value = normalizeItems([...data.items])
+    applyingRemote = false
+  }
+
+  const pushToServer = async () => {
+    if (applyingRemote || !hydrated.value) return
+    pushing.value = true
+    try {
+      const data = await $fetch('/api/checklist', {
+        method: 'PUT',
+        body: { items: items.value }
+      })
+      revision.value = data.revision
+    } catch (error) {
+      console.error(error)
+    } finally {
+      pushing.value = false
+    }
+  }
+
+  const schedulePush = () => {
+    if (pushTimer) clearTimeout(pushTimer)
+    pushTimer = setTimeout(() => pushToServer(), 400)
+  }
+
+  const pullFromServer = async () => {
+    try {
+      const data = await $fetch('/api/checklist')
+      applyRemote(data)
+    } catch (error) {
+      console.error(error)
+    }
+  }
+
+  const startLiveSync = () => {
+    stopLiveSync()
+    pollTimer = setInterval(() => {
+      if (!pushing.value) pullFromServer()
+    }, POLL_MS)
+  }
+
+  const stopLiveSync = () => {
+    if (pollTimer) clearInterval(pollTimer)
+    pollTimer = null
+    if (pushTimer) clearTimeout(pushTimer)
+    pushTimer = null
+  }
+
+  const load = async () => {
+    hydrated.value = false
+    try {
+      const data = await $fetch('/api/checklist')
+      if (data.items?.length) {
+        revision.value = data.revision
+        items.value = normalizeItems(data.items)
+      } else {
+        items.value = makeSeedItems()
+        await pushToServer()
+      }
+    } catch {
       items.value = makeSeedItems()
-      writeStorage(items.value)
     }
     hydrated.value = true
+    startLiveSync()
   }
 
   const addItem = (name, category, owner) => {
@@ -74,37 +129,53 @@ export function useTrekChecklist() {
       id: crypto.randomUUID(),
       name: trimmed,
       category,
-      owner,
+      owner: normalizeOwnerLabel(owner),
+      packedBy: emptyPackedBy(),
       done: false,
       created_at: new Date().toISOString()
     })
     sortItems(items.value)
+    schedulePush()
     return true
   }
 
   const toggleItem = (item) => {
-    item.done = !item.done
+    const uid = getActiveUserId()
+    if (!uid || (uid !== 'ankit' && uid !== 'baishakhi')) return
+
+    if (!item.packedBy) item.packedBy = emptyPackedBy()
+    item.packedBy[uid] = !item.packedBy[uid]
+    item.done = syncDoneFromPackedBy(item.packedBy)
+    schedulePush()
+  }
+
+  const isCheckedByMe = (item) => {
+    const uid = getActiveUserId()
+    if (!uid || !item.packedBy) return false
+    return Boolean(item.packedBy[uid])
   }
 
   const removeItem = (item) => {
     items.value = items.value.filter(i => i.id !== item.id)
+    schedulePush()
   }
 
-  const restoreStarter = () => {
+  const restoreStarter = async () => {
     items.value = makeSeedItems()
+    await pushToServer()
   }
 
   const exportBackup = async () => {
     const json = JSON.stringify(items.value)
     try {
       await navigator.clipboard.writeText(json)
-      alert('Checklist copied. Send it to your partner to import.')
+      alert('Checklist copied.')
     } catch {
       prompt('Copy this checklist:', json)
     }
   }
 
-  const importBackup = () => {
+  const importBackup = async () => {
     const raw = prompt('Paste checklist backup:')
     if (!raw?.trim()) return
     try {
@@ -113,19 +184,14 @@ export function useTrekChecklist() {
         alert('Invalid backup.')
         return
       }
-      items.value = sortItems(parsed)
+      items.value = normalizeItems(parsed)
+      await pushToServer()
     } catch {
       alert('Could not read backup.')
     }
   }
 
-  watch(
-    items,
-    value => {
-      if (hydrated.value) writeStorage(value)
-    },
-    { deep: true }
-  )
+  onUnmounted(() => stopLiveSync())
 
   return {
     items,
@@ -133,9 +199,13 @@ export function useTrekChecklist() {
     load,
     addItem,
     toggleItem,
+    isCheckedByMe,
     removeItem,
     restoreStarter,
     exportBackup,
-    importBackup
+    importBackup,
+    stopLiveSync,
+    markLabelForItem,
+    packedByLabel
   }
 }

@@ -1,5 +1,16 @@
 <script setup>
-const { unlocked, ready: pinReady, pin, pinError, checking, init, submitPin } = usePinGate()
+const {
+  unlocked,
+  ready: pinReady,
+  pin,
+  userId,
+  pinError,
+  checking,
+  currentUserLabel,
+  init,
+  submitPin,
+  signOut
+} = usePinGate()
 
 const {
   items,
@@ -7,10 +18,14 @@ const {
   load,
   addItem: saveItem,
   toggleItem,
+  isCheckedByMe,
   removeItem,
   restoreStarter,
   exportBackup,
-  importBackup
+  importBackup,
+  stopLiveSync,
+  markLabelForItem,
+  packedByLabel
 } = useTrekChecklist()
 
 const filter = ref('all')
@@ -55,21 +70,26 @@ const confirmRestore = () => {
   }
 }
 
-onMounted(() => {
-  init()
-})
+onMounted(() => init())
 
 watch(unlocked, value => {
   if (value && !hydrated.value) load()
+  if (!value) stopLiveSync()
 }, { immediate: true })
 </script>
 
 <template>
   <div v-if="pinReady && !unlocked" class="pin-screen">
     <div class="pin-card">
-      <div class="eyebrow">🏔️ TREK CHECKLIST</div>
-      <h1>Enter PIN</h1>
-      <p class="pin-lead">6-digit code to open the packing list.</p>
+      <div class="eyebrow">🏔️ ANKIT & BAISHAKHI</div>
+      <h1>Sign in</h1>
+      <p class="pin-lead">Choose your name and enter the 6-digit PIN.</p>
+      <select v-model="userId" class="pin-select" aria-label="Your name">
+        <option disabled value="">Who are you?</option>
+        <option v-for="person in TREK_USER_OPTIONS" :key="person.id" :value="person.id">
+          {{ person.label }}
+        </option>
+      </select>
       <input
         v-model="pin"
         type="password"
@@ -78,14 +98,14 @@ watch(unlocked, value => {
         maxlength="6"
         autocomplete="one-time-code"
         class="pin-input"
-        placeholder="••••••"
+        placeholder="6-digit PIN"
         aria-label="6-digit PIN"
         @input="pin = pin.replace(/\D/g, '').slice(0, 6)"
         @keyup.enter="submitPin"
       />
       <p v-if="pinError" class="pin-error" role="alert">{{ pinError }}</p>
       <button type="button" class="btn-primary pin-submit" :disabled="checking" @click="submitPin">
-        {{ checking ? 'Checking…' : 'Unlock' }}
+        {{ checking ? 'Checking…' : 'Open checklist' }}
       </button>
     </div>
   </div>
@@ -93,9 +113,9 @@ watch(unlocked, value => {
   <main v-else-if="unlocked && hydrated" class="page">
     <section class="hero">
       <div>
-        <div class="eyebrow">🏔️ COUPLE TREK</div>
+        <div class="eyebrow">🏔️ ANKIT & BAISHAKHI</div>
         <h1>Our Trek Checklist</h1>
-        <p>Tungnath → Chandrashila</p>
+        <p>Tungnath → Chandrashila · {{ currentUserLabel }}</p>
       </div>
       <div class="progress-card" aria-live="polite">
         <strong>{{ progress }}%</strong>
@@ -106,6 +126,8 @@ watch(unlocked, value => {
     <div class="progress" role="progressbar" :aria-valuenow="progress" aria-valuemin="0" aria-valuemax="100">
       <span :style="{ width: `${progress}%` }" />
     </div>
+
+    <p class="banner ok">Live sync on — ticks show who packed (Shared when both of you mark).</p>
 
     <section class="add-card">
       <input
@@ -120,7 +142,7 @@ watch(unlocked, value => {
       <select v-model="newCategory" aria-label="Category">
         <option v-for="c in TREK_CATEGORIES" :key="c">{{ c }}</option>
       </select>
-      <select v-model="newOwner" aria-label="Owner">
+      <select v-model="newOwner" aria-label="Who brings this">
         <option v-for="owner in TREK_OWNERS" :key="owner">{{ owner }}</option>
       </select>
       <button type="button" class="btn-primary" @click="addItem">＋ Add</button>
@@ -138,17 +160,22 @@ watch(unlocked, value => {
         v-for="item in categoryItems"
         :key="item.id"
         class="item"
-        :class="{ checked: item.done }"
+        :class="{ checked: isCheckedByMe(item) }"
       >
         <input
           type="checkbox"
           class="item-check"
-          :checked="item.done"
+          :checked="isCheckedByMe(item)"
           @change="toggleItem(item)"
         />
         <span class="item-body">
-          <span class="item-name">{{ item.name }}</span>
-          <span class="owner">{{ item.owner }}</span>
+          <span class="item-name" :class="{ 'any-packed': item.done }">{{ item.name }}</span>
+          <span
+            class="owner"
+            :class="{ marked: packedByLabel(item.packedBy), assigned: !packedByLabel(item.packedBy) }"
+          >
+            {{ markLabelForItem(item) }}
+          </span>
         </span>
         <button
           type="button"
@@ -167,6 +194,7 @@ watch(unlocked, value => {
       <button type="button" @click="exportBackup">Share backup</button>
       <button type="button" @click="importBackup">Import backup</button>
       <button type="button" @click="confirmRestore">Restore starter</button>
+      <button type="button" class="btn-muted" @click="signOut">Switch person</button>
     </footer>
   </main>
 </template>

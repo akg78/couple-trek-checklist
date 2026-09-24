@@ -53,6 +53,10 @@ button { cursor: pointer; }
   line-height: 1.45;
 }
 
+.pin-select {
+  margin-bottom: 10px;
+}
+
 .pin-input {
   letter-spacing: 0.35em;
   text-align: center;
@@ -118,6 +122,26 @@ h1 { margin: 6px 0 2px; font-size: clamp(28px, 7.5vw, 42px); line-height: 1.05; 
   height: 100%;
   background: linear-gradient(90deg, #9b6ff0, #b38bfa);
   transition: width 0.25s ease;
+}
+
+.banner {
+  margin-bottom: 12px;
+  padding: 11px 13px;
+  border-radius: 12px;
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.banner.ok {
+  border: 1px solid #2f3d32;
+  background: #151c18;
+  color: #b8d4c0;
+}
+
+.banner.warn {
+  border: 1px solid #5c4a2a;
+  background: #1f1a12;
+  color: #e8d4a8;
 }
 
 .add-card {
@@ -242,6 +266,26 @@ h2 {
   border-radius: 99px;
   background: #202228;
   color: #c7c8cf;
+}
+
+.owner.marked {
+  background: #2a2438;
+  color: #d4c4f5;
+  font-weight: 600;
+}
+
+.owner.assigned {
+  opacity: 0.75;
+}
+
+.item-name.any-packed {
+  opacity: 0.92;
+}
+
+.btn-muted {
+  background: transparent;
+  border-color: #383b45;
+  color: #a7a9b2;
 }
 
 .delete {

@@ -1,12 +1,22 @@
 # Trek Checklist
 
-Private mobile checklist for a Himalayan trek. Data stays in the browser (`localStorage`).
+Shared trekking checklist with **live sync** between phones (Ankit & Baishakhi).
 
 ```bash
 npm install
 npm run dev
 ```
 
-**Deploy (Vercel):** import the GitHub repo → deploy. No environment variables required. Share the site link and your 6-digit PIN only with your travel partner.
+Share the PIN privately with your partner.
 
-**Sync between phones:** Share backup → WhatsApp → Import backup on the other device.
+## Deploy on Vercel
+
+1. Push to GitHub and import on [Vercel](https://vercel.com).
+2. Deploy — no extra services required for the app to run.
+3. For **two-phone live sync** on production: Vercel project → **Storage** → **Blob** → Create & connect → **Redeploy** (adds `BLOB_READ_WRITE_TOKEN` automatically).
+
+Open the URL on both phones, sign in with your name + PIN.
+
+## Optional
+
+**Share backup** / **Import backup** — manual snapshot.
