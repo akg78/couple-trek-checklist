@@ -2,7 +2,7 @@ import { trekkingChecklist } from '~/data/trekking-checklist'
 
 export const TREK_CATEGORIES = trekkingChecklist.map(group => group.category)
 
-const POLL_MS = 2500
+const POLL_MS = 5000
 
 const sortItems = (list) =>
   list.sort((a, b) => a.created_at.localeCompare(b.created_at))
@@ -49,19 +49,21 @@ export function useTrekChecklist() {
   const pushing = ref(false)
   let pollTimer = null
   let pushTimer = null
+  let visibilityHandler = null
   let applyingRemote = false
 
   const applyRemote = (data) => {
     if (!data || !Array.isArray(data.items)) return
-    if (data.revision === revision.value) return
+    const remoteRev = Number(data.revision) || 0
+    if (remoteRev <= revision.value) return
     applyingRemote = true
-    revision.value = data.revision
+    revision.value = remoteRev
     items.value = normalizeItems([...data.items])
     applyingRemote = false
   }
 
-  const pushToServer = async () => {
-    if (applyingRemote || !hydrated.value) return
+  const pushToServer = async ({ initial = false } = {}) => {
+    if (applyingRemote || (!hydrated.value && !initial)) return
     pushing.value = true
     try {
       const data = await $fetch('/api/checklist', {
@@ -90,11 +92,21 @@ export function useTrekChecklist() {
     }
   }
 
+  const tickPoll = () => {
+    if (import.meta.client && document.visibilityState === 'hidden') return
+    if (!pushing.value) pullFromServer()
+  }
+
   const startLiveSync = () => {
     stopLiveSync()
-    pollTimer = setInterval(() => {
-      if (!pushing.value) pullFromServer()
-    }, POLL_MS)
+    pollTimer = setInterval(tickPoll, POLL_MS)
+
+    if (import.meta.client) {
+      visibilityHandler = () => {
+        if (document.visibilityState === 'visible') pullFromServer()
+      }
+      document.addEventListener('visibilitychange', visibilityHandler)
+    }
   }
 
   const stopLiveSync = () => {
@@ -102,6 +114,10 @@ export function useTrekChecklist() {
     pollTimer = null
     if (pushTimer) clearTimeout(pushTimer)
     pushTimer = null
+    if (import.meta.client && visibilityHandler) {
+      document.removeEventListener('visibilitychange', visibilityHandler)
+      visibilityHandler = null
+    }
   }
 
   const load = async () => {
@@ -113,7 +129,7 @@ export function useTrekChecklist() {
         items.value = normalizeItems(data.items)
       } else {
         items.value = makeSeedItems()
-        await pushToServer()
+        await pushToServer({ initial: true })
       }
     } catch {
       items.value = makeSeedItems()
