@@ -4,11 +4,9 @@ Private mobile checklist for a Himalayan trek. Data stays in the browser (`local
 
 ```bash
 npm install
-cp .env.example .env
-# Set NUXT_TREK_PIN in .env (6 digits), then:
 npm run dev
 ```
 
-**Deploy (Vercel):** import the GitHub repo → add **`NUXT_TREK_PIN`** (6 digits; `TREK_PIN` also works) → **Redeploy**. Share the link and PIN only with your travel partner.
+**Deploy (Vercel):** import the GitHub repo → deploy. No environment variables required. Share the site link and your 6-digit PIN only with your travel partner.
 
 **Sync between phones:** Share backup → WhatsApp → Import backup on the other device.

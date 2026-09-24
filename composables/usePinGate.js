@@ -25,19 +25,16 @@ export function usePinGate() {
 
     checking.value = true
     try {
-      await $fetch('/api/unlock', { method: 'POST', body: { pin: pin.value } })
+      const ok = await isValidPin(pin.value)
+      if (!ok) {
+        pinError.value = 'Wrong PIN. Try again.'
+        return
+      }
       sessionStorage.setItem(UNLOCK_KEY, '1')
       unlocked.value = true
       pin.value = ''
-    } catch (error) {
-      const status = error?.statusCode ?? error?.response?.status
-      if (status === 503) {
-        pinError.value = 'Server PIN not set. Add NUXT_TREK_PIN on Vercel and redeploy.'
-      } else if (status === 401) {
-        pinError.value = 'Wrong PIN. Try again.'
-      } else {
-        pinError.value = 'Could not verify PIN. Restart dev server or try again.'
-      }
+    } catch {
+      pinError.value = 'Could not verify PIN. Try again.'
     } finally {
       checking.value = false
     }
