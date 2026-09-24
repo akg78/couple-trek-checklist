@@ -29,16 +29,25 @@ const {
 } = useTrekChecklist()
 
 const filter = ref('all')
+const searchQuery = ref('')
 const newItem = ref('')
 const newCategory = ref(TREK_CATEGORIES[0])
 const newOwner = ref(DEFAULT_OWNER)
 
-const filtered = computed(() =>
-  items.value.filter(i =>
-    filter.value === 'all' ||
-    (filter.value === 'done' ? i.done : !i.done)
-  )
-)
+const filtered = computed(() => {
+  const q = searchQuery.value.trim().toLowerCase()
+  return items.value.filter(i => {
+    const statusOk =
+      filter.value === 'all' ||
+      (filter.value === 'done' ? i.done : !i.done)
+    if (!statusOk) return false
+    if (!q) return true
+    const hay = [i.name, i.category, i.owner, markLabelForItem(i)]
+      .join(' ')
+      .toLowerCase()
+    return hay.includes(q)
+  })
+})
 
 const grouped = computed(() => {
   const map = new Map()
@@ -148,6 +157,18 @@ watch(unlocked, value => {
       <button type="button" class="btn-primary" @click="addItem">＋ Add</button>
     </section>
 
+    <label class="search-bar">
+      <span class="visually-hidden">Search checklist</span>
+      <input
+        v-model="searchQuery"
+        type="search"
+        enterkeyhint="search"
+        autocomplete="off"
+        placeholder="Search items, category, who brings…"
+        aria-label="Search checklist"
+      />
+    </label>
+
     <nav class="filters" aria-label="Filter checklist">
       <button type="button" :class="{ active: filter === 'all' }" @click="filter = 'all'">All</button>
       <button type="button" :class="{ active: filter === 'pending' }" @click="filter = 'pending'">Pending</button>
@@ -188,7 +209,9 @@ watch(unlocked, value => {
       </label>
     </section>
 
-    <div v-if="!grouped.length" class="empty">No items in this view.</div>
+    <div v-if="!grouped.length" class="empty">
+      {{ searchQuery.trim() ? 'No items match your search.' : 'No items in this view.' }}
+    </div>
 
     <footer class="footer-actions">
       <button type="button" @click="exportBackup">Share backup</button>
