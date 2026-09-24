@@ -1,0 +1,425 @@
+export type TrekSeedGroup = {
+  category: string
+  items: string[]
+}
+
+export const trekkingChecklist: TrekSeedGroup[] = [
+  {
+    category: 'Documents & Money',
+    items: [
+      'Aadhaar Card / Government ID',
+      'Driving Licence',
+      'Passport',
+      'Train Tickets',
+      'Flight Tickets / Boarding Pass',
+      'Hotel Booking Confirmation',
+      'Trek Booking / Permit Documents',
+      'Emergency Contact Details',
+      'Photocopies of Important Documents',
+      'Passport-size Photographs',
+      'Debit Card',
+      'Credit Card',
+      'UPI-enabled Phone',
+      'Cash',
+      'Emergency Cash',
+      'Wallet',
+      'Waterproof Document Pouch',
+      'Pen'
+    ]
+  },
+  {
+    category: 'Bags & Storage',
+    items: [
+      'Large Travel Backpack',
+      'Trekking Backpack',
+      'Small Daypack',
+      'Sling Bag',
+      'Waist Pouch / Money Belt',
+      'Backpack Rain Cover',
+      'Dry Bags',
+      'Packing Cubes',
+      'Ziplock Bags',
+      'Plastic Bags',
+      'Garbage Bags',
+      'Laundry Bag',
+      'Luggage Locks',
+      'Bag Tags',
+      'Compression Straps',
+      'Carabiners'
+    ]
+  },
+  {
+    category: 'Clothing',
+    items: [
+      'T-Shirts',
+      'Full-sleeve T-Shirts',
+      'Thermal Inner Top',
+      'Thermal Inner Bottom',
+      'Trekking Pants',
+      'Travel Pants',
+      'Track Pants',
+      'Shorts',
+      'Underwear',
+      'Sports Underwear',
+      'Trekking Socks',
+      'Extra Socks',
+      'Sleepwear',
+      'Sweater',
+      'Hoodie',
+      'Fleece Jacket',
+      'Down / Puffer Jacket',
+      'Windproof Jacket',
+      'Waterproof Jacket',
+      'Waterproof Pants',
+      'Warm Inner Layers',
+      'Neck Warmer',
+      'Balaclava',
+      'Woollen Cap',
+      'Beanie',
+      'Muffler / Scarf',
+      'Gloves',
+      'Waterproof Gloves',
+      'Extra Complete Dry Clothes'
+    ]
+  },
+  {
+    category: 'Footwear',
+    items: [
+      'Trekking Shoes',
+      'Travel Shoes',
+      'Slippers',
+      'Sandals',
+      'Extra Shoelaces',
+      'Trekking Socks',
+      'Woollen Socks',
+      'Gaiters',
+      'Microspikes / Crampons if Required',
+      'Shoe Waterproofing Spray'
+    ]
+  },
+  {
+    category: 'Sun & Cold Protection',
+    items: [
+      'Sunglasses',
+      'UV Protection Sunglasses',
+      'Sunglasses Case',
+      'Sunscreen SPF 50+',
+      'Lip Balm with SPF',
+      'Moisturizer',
+      'Cold Cream',
+      'Hand Cream',
+      'Vaseline / Petroleum Jelly',
+      'Neck Gaiter',
+      'Buff',
+      'Cap',
+      'Woollen Cap',
+      'Face Mask',
+      'Handkerchief',
+      'Small Towel'
+    ]
+  },
+  {
+    category: 'Toiletries',
+    items: [
+      'Toothbrush',
+      'Toothpaste',
+      'Mouthwash',
+      'Soap',
+      'Shampoo',
+      'Conditioner',
+      'Body Wash',
+      'Face Wash',
+      'Deodorant',
+      'Perfume',
+      'Comb',
+      'Hairbrush',
+      'Wet Wipes',
+      'Dry Tissues',
+      'Toilet Paper',
+      'Hand Sanitizer',
+      'Pocket Tissues',
+      'Cotton Buds',
+      'Cotton Pads',
+      'Nail Cutter',
+      'Nail File',
+      'Small Mirror',
+      'Razor',
+      'Shaving Kit',
+      'Hair Ties',
+      'Hair Clips'
+    ]
+  },
+  {
+    category: 'First Aid & Health',
+    items: [
+      'Adhesive Bandages',
+      'Large Bandages',
+      'Gauze',
+      'Medical Tape',
+      'Antiseptic Wipes',
+      'Antiseptic Solution',
+      'Antiseptic Cream',
+      'ORS',
+      'Electrolyte Packets',
+      'Personal Prescription Medicines',
+      'Pain Relief Medicine',
+      'Motion Sickness Medicine',
+      'Anti-diarrheal Medicine',
+      'Thermometer',
+      'Small Scissors',
+      'Tweezers',
+      'Disposable Gloves',
+      'Blister Pads',
+      'Moleskin / Blister Protection',
+      'Elastic Bandage',
+      'Instant Cold Pack',
+      'Insect Repellent'
+    ]
+  },
+  {
+    category: 'Trekking Gear',
+    items: [
+      'Trekking Poles',
+      'Headlamp',
+      'Spare Headlamp Batteries',
+      'Flashlight',
+      'Whistle',
+      'Compass',
+      'Offline Maps',
+      'GPS / GPS Watch',
+      'Emergency Blanket',
+      'Emergency Poncho',
+      'Waterproof Matches / Lighter',
+      'Multi-tool',
+      'Carabiners',
+      'Paracord',
+      'Duct Tape',
+      'Repair Tape',
+      'Needle',
+      'Thread',
+      'Safety Pins',
+      'Zip Ties',
+      'Backpack Rain Cover',
+      'Dry Bags'
+    ]
+  },
+  {
+    category: 'Electronics',
+    items: [
+      'Smartphone',
+      'Phone Charger',
+      'Power Bank',
+      'Charging Cable',
+      'Spare Charging Cable',
+      'Fast Charger',
+      'Universal Travel Adapter',
+      'Smartwatch',
+      'Smartwatch Charger',
+      'Earphones',
+      'Bluetooth Earbuds',
+      'Camera',
+      'Camera Batteries',
+      'Camera Charger',
+      'Memory Cards',
+      'Card Reader',
+      'Tripod',
+      'Mini Tripod',
+      'Selfie Stick',
+      'Action Camera',
+      'Action Camera Batteries',
+      'Lens Cleaning Cloth',
+      'Power Bank Pouch'
+    ]
+  },
+  {
+    category: 'Food & Snacks',
+    items: [
+      'Energy Bars',
+      'Protein Bars',
+      'Chocolate',
+      'Dry Fruits',
+      'Almonds',
+      'Cashews',
+      'Raisins',
+      'Dates',
+      'Trail Mix',
+      'Peanut Butter Sachets',
+      'Biscuits',
+      'Glucose Biscuits',
+      'Candy',
+      'Toffee',
+      'Electrolyte Sachets',
+      'Reusable Water Bottle',
+      'Insulated Water Bottle',
+      'Hydration Bladder',
+      'Water Purification Tablets / Filter'
+    ]
+  },
+  {
+    category: 'Eating Equipment',
+    items: [
+      'Lightweight Cup',
+      'Spoon',
+      'Spork',
+      'Small Bowl',
+      'Water Bottle',
+      'Thermos / Flask',
+      'Camping Stove',
+      'Camping Fuel',
+      'Lightweight Cookware',
+      'Lighter'
+    ]
+  },
+  {
+    category: 'Camping & Sleeping',
+    items: [
+      'Sleeping Bag',
+      'Sleeping Bag Liner',
+      'Sleeping Mat',
+      'Inflatable Pillow',
+      'Pillow Cover',
+      'Earplugs',
+      'Eye Mask',
+      'Emergency Blanket'
+    ]
+  },
+  {
+    category: 'Hotel & Stay',
+    items: [
+      'Small Lock',
+      'Door Stopper',
+      'Travel Towel',
+      'Slippers',
+      'Eye Mask',
+      'Earplugs',
+      'Laundry Bag',
+      'Extension Board',
+      'Small Power Strip',
+      'Travel Adapter',
+      'Reusable Water Bottle'
+    ]
+  },
+  {
+    category: 'Cleaning & Hygiene',
+    items: [
+      'Hand Sanitizer',
+      'Wet Wipes',
+      'Dry Tissues',
+      'Toilet Paper',
+      'Small Garbage Bags',
+      'Ziplock Bags',
+      'Detergent',
+      'Microfiber Cloth',
+      'Disinfectant Wipes',
+      'Small Towel'
+    ]
+  },
+  {
+    category: 'Emergency & Repair',
+    items: [
+      'Safety Pins',
+      'Needle',
+      'Thread',
+      'Small Scissors',
+      'Duct Tape',
+      'Super Glue',
+      'Zip Ties',
+      'Extra Shoelaces',
+      'Carabiner',
+      'Small Rope / Paracord',
+      'Sewing Kit',
+      'Spare Batteries'
+    ]
+  },
+  {
+    category: 'Photography & Content Creation',
+    items: [
+      'Camera',
+      'Wide Lens',
+      'Telephoto Lens',
+      'Action Camera',
+      'Extra Camera Batteries',
+      'Memory Cards',
+      'ND Filters',
+      'Lens Cleaning Kit',
+      'Mini Tripod',
+      'Tripod',
+      'Phone Gimbal',
+      'Microphone',
+      'Wind Muff',
+      'Power Bank',
+      'USB-C Cables',
+      'Portable SSD',
+      'Hard Drive'
+    ]
+  },
+  {
+    category: 'Phone & Connectivity',
+    items: [
+      'Smartphone',
+      'Power Bank',
+      'Backup Charging Cable',
+      'SIM Card',
+      'Offline Maps',
+      'Emergency Contacts',
+      'Hotel Contact Numbers',
+      'Trek Operator Contact',
+      'Transport Booking Screenshots',
+      'Important Documents Stored Offline',
+      'Cloud Backup'
+    ]
+  },
+  {
+    category: 'Trek Daypack Essentials',
+    items: [
+      'Water Bottle',
+      'Snacks',
+      'ORS',
+      'Rain Jacket',
+      'Gloves',
+      'Cap',
+      'Extra Warm Layer',
+      'Toilet Paper',
+      'Wet Wipes',
+      'Mini First Aid Kit',
+      'Power Bank',
+      'Headlamp',
+      'Sunscreen',
+      'Lip Balm',
+      'Sunglasses',
+      'Phone',
+      'Camera',
+      'Trekking Poles'
+    ]
+  },
+  {
+    category: 'Tungnath & Chandrashila Specific',
+    items: [
+      'Proper Trekking Shoes',
+      'Good Trekking Socks',
+      'Thermal Innerwear',
+      'Fleece Layer',
+      'Warm Jacket',
+      'Waterproof Jacket',
+      'Waterproof Pants',
+      'Warm Gloves',
+      'Woollen Cap',
+      'Sunglasses',
+      'SPF 50+ Sunscreen',
+      'Lip Balm',
+      'Water Bottle',
+      'Electrolytes',
+      'Trekking Poles',
+      'Headlamp',
+      'Power Bank',
+      'Blister Protection',
+      'Personal Medicines',
+      'High-energy Snacks',
+      'Rain Cover',
+      'Offline Maps',
+      'Emergency Contact Details',
+      'Cash',
+      'Government ID'
+    ]
+  }
+]
